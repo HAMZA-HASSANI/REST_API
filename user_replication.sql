@@ -1,0 +1,1 @@
+CREATE ROLE replication_user WITH REPLICATION LOGIN PASSWORD 'replicationPassword';

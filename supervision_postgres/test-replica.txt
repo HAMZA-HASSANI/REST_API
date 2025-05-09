@@ -1,0 +1,21 @@
+--> Test the replication
+
+# login to postgres
+psql --username=admin postgresdb
+
+#create a table
+CREATE TABLE customers (firstname text, customer_id serial, date_created timestamp);
+INSERT INTO customers (firstname, date_created) VALUES ('Bob', NOW()),('Charlie', NOW());
+
+#show the table
+\dt
+select * from customers;
+
+docker exec -it postgres-2 bash
+
+# login to postgres
+psql --username=admin postgresdb
+
+#show the tables
+\dt
+select * from customers;

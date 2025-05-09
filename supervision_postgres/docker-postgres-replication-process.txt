@@ -1,0 +1,55 @@
+--> creation de réseau :
+
+docker network create postgres
+
+--> creation du primaire :
+
+docker run -it --rm --name postgres-1 `
+--net postgres `
+-e POSTGRES_USER=admin `
+-e POSTGRES_PASSWORD=admin `
+-e POSTGRES_DB=postgresdb `
+-e PGDATA="/data" `
+-v ${PWD}/postgres-1/pgdata:/data `
+-v ${PWD}/postgres-1/config:/config `
+-v ${PWD}/postgres-1/config/pg_hba.conf:/config/pg_hba.conf `
+-v ${PWD}/postgres-1/archive:/mnt/server/archive `
+-p 5000:5432 `
+postgres:16.0 -c config_file=/config/postgresql.conf
+
+docker exec -it postgres-1 bash
+
+# create a new user
+createuser -U admin -P -c 5 --replication replicationUser
+
+exit
+
+
+--> Take a base backup
+
+cd storage/databases/postgresql/3-replication
+
+docker run -it --rm `
+--net postgres `
+-v ${PWD}/postgres-2/pgdata:/data `
+--entrypoint /bin/bash postgres:16.0
+
+pg_basebackup -h postgres-1 -p 5432 -U replicationUser -D /data/ -Fp -Xs -R
+
+--> Start standby instance
+
+docker run -it --rm --name postgres-2 `
+--net postgres `
+-e POSTGRES_USER=admin `
+-e POSTGRES_PASSWORD=admin `
+-e POSTGRES_DB=postgresdb `
+-e PGDATA="/data" `
+-v ${PWD}/postgres-2/pgdata:/data `
+-v ${PWD}/postgres-2/config:/config `
+-v ${PWD}/postgres-2/config/pg_hba.conf:/config/pg_hba.conf `
+-v ${PWD}/postgres-2/archive:/mnt/server/archive `
+-p 5001:5432 `
+postgres:16.0 -c 'config_file=/config/postgresql.conf'
+
+
+

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+        input, button, textarea {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        textarea {
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Customer API Tester</h1>
+
+        <!-- Get Customer by Firstname -->
+        <h2>Get Customer by Firstname</h2>
+        <input type="text" id="firstname" placeholder="Enter firstname">
+        <button onclick="getCustomer()">Get Customer</button>
+
+        <!-- Get All Customers -->
+        <h2>Get All Customers</h2>
+        <button onclick="getAllCustomers()">Get All Customers</button>
+
+        <!-- Create Customer -->
+        <h2>Create Customer</h2>
+        <input type="text" id="createFirstname" placeholder="Enter firstname">
+        <button onclick="createCustomer()">Create Customer</button>
+
+        <!-- Update Customer -->
+        <h2>Update Customer</h2>
+        <input type="number" id="updateCustomerId" placeholder="Enter customer ID">
+        <input type="text" id="updateFirstname" placeholder="Enter new firstname">
+        <button onclick="updateCustomer()">Update Customer</button>
+
+        <!-- Delete Customer -->
+        <h2>Delete Customer</h2>
+        <input type="number" id="deleteCustomerId" placeholder="Enter customer ID">
+        <button onclick="deleteCustomer()">Delete Customer</button>
+
+        <!-- Response -->
+        <h2>Response</h2>
+        <textarea id="response" readonly></textarea>
+    </div>
+
+    <script>
+        async function getCustomer() {
+            const firstname = document.getElementById('firstname').value;
+            const responseField = document.getElementById('response');
+
+            try {
+                const response = await fetch(`http://localhost:8080/api.php?firstname=${encodeURIComponent(firstname)}`);
+                const data = await response.json();
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseField.value = `Error: ${error.message}`;
+            }
+        }
+
+        async function getAllCustomers() {
+            const responseField = document.getElementById('response');
+
+            try {
+                const response = await fetch('http://localhost:8080/api.php');
+                const data = await response.json();
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseField.value = `Error: ${error.message}`;
+            }
+        }
+
+        async function createCustomer() {
+            const firstname = document.getElementById('createFirstname').value;
+            const responseField = document.getElementById('response');
+
+            try {
+                const response = await fetch('http://localhost:8080/api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ firstname })
+                });
+                const data = await response.json();
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseField.value = `Error: ${error.message}`;
+            }
+        }
+
+        async function updateCustomer() {
+            const customerId = document.getElementById('updateCustomerId').value;
+            const firstname = document.getElementById('updateFirstname').value;
+            const responseField = document.getElementById('response');
+
+            try {
+                const response = await fetch('http://localhost:8080/api.php', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customer_id: customerId, firstname })
+                });
+                const data = await response.json();
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseField.value = `Error: ${error.message}`;
+            }
+        }
+
+        async function deleteCustomer() {
+            const customerId = document.getElementById('deleteCustomerId').value;
+            const responseField = document.getElementById('response');
+
+            try {
+                const response = await fetch('http://localhost:8080/api.php', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customer_id: customerId })
+                });
+                const data = await response.json();
+                responseField.value = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseField.value = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
